@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # Функция для извлечения ВПГ из видеоизображения
 def extract_vpg(video_path):
     # Загрузка видео
@@ -25,29 +24,37 @@ def extract_vpg(video_path):
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
-        # Выбор ближайшего лица
+        # Определение минимального значения стороны прямоугольника лица
+        min_face_side = 150
+
+        # Выбор ближайшего лица с учетом минимального значения стороны
         if len(faces) > 0:
-            # Вычисление расстояний до всех лиц
-            distances = []
-            for (x, y, w, h) in faces:
-                distance = np.sqrt((x - frame.shape[1]/2)**2 + (y - frame.shape[0]/2)**2)
-                distances.append(distance)
+            # Инициализация переменных для хранения индекса и стороны ближайшего лица
+            closest_face_index = None
+            closest_face_side = None
+
+            # Перебор всех обнаруженных лиц
+            for i, (x, y, w, h) in enumerate(faces):
+                # Проверка, соответствует ли сторона прямоугольника минимальному значению
+                if w >= min_face_side and h >= min_face_side:
+                    # Проверка, является ли это первым лицом или оно ближе к центру кадра
+                    if closest_face_side is None or (w + h) < closest_face_side:
+                        closest_face_index = i
+                        closest_face_side = w + h
 
             # Извлечение ближайшего лица
-            closest_face_index = np.argmin(distances)
-            (x, y, w, h) = faces[closest_face_index]
+            if closest_face_index is not None:
+                (x, y, w, h) = faces[closest_face_index]
 
-            # Извлечение региона интереса (ROI) ближайшего лица
-            roi = gray[y:y+h, x:x+w]
+                # Извлечение региона интереса (ROI) ближайшего лица
+                roi = gray[y:y+h, x:x+w]
 
-            # Извлечение среднего значения интенсивности пикселей в ROI
-            intensity = np.mean(roi)
-            intensity_values.append(intensity)
+                # Извлечение среднего значения интенсивности пикселей в ROI
+                intensity = np.mean(roi)
+                intensity_values.append(intensity)
 
-            # Отрисовка прямоугольника вокруг ближайшего лица
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-
+                # Отрисовка прямоугольника вокруг ближайшего лица
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Вывод кадра с прямоугольником, обозначающим ближайшее лицо
         cv2.imshow('Video', frame)
@@ -60,12 +67,12 @@ def extract_vpg(video_path):
     cap.release()
     cv2.destroyAllWindows()
 
-    # возврат временных изменений интенсивности
+    # Возврат временных изменений интенсивности
     intensity_values = np.array(intensity_values)
     return intensity_values
 
 
-    # Пример использования функции
+# Пример использования функции
 source_dir = 'C:/Users/79778/PycharmProjects/Practics/AVIMeasurements'
 file_names = os.listdir(source_dir)
 for file_name in file_names:
@@ -89,4 +96,5 @@ for file_name in file_names:
     plt.title('Video Plethysmography Signal')
     plt.grid(True)
     plt.show()
+
 
