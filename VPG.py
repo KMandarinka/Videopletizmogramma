@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # Функция для извлечения ВПГ из видеоизображения
 def extract_vpg(video_path):
     # Загрузка видео
@@ -27,7 +28,7 @@ def extract_vpg(video_path):
         # Определение минимального значения стороны прямоугольника лица
         min_face_side = 150
 
-        # Выбор ближайшего лица с учетом минимального значения стороны
+        # Выбор ближайшего лица
         if len(faces) > 0:
             # Инициализация переменных для хранения индекса и стороны ближайшего лица
             closest_face_index = None
@@ -56,6 +57,8 @@ def extract_vpg(video_path):
                 # Отрисовка прямоугольника вокруг ближайшего лица
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
+
+
         # Вывод кадра с прямоугольником, обозначающим ближайшее лицо
         cv2.imshow('Video', frame)
 
@@ -67,12 +70,12 @@ def extract_vpg(video_path):
     cap.release()
     cv2.destroyAllWindows()
 
-    # Возврат временных изменений интенсивности
+    # возврат временных изменений интенсивности
     intensity_values = np.array(intensity_values)
     return intensity_values
 
 
-# Пример использования функции
+    # Пример использования функции
 source_dir = 'C:/Users/79778/PycharmProjects/Practics/AVIMeasurements'
 file_names = os.listdir(source_dir)
 for file_name in file_names:
@@ -96,5 +99,4 @@ for file_name in file_names:
     plt.title('Video Plethysmography Signal')
     plt.grid(True)
     plt.show()
-
 
