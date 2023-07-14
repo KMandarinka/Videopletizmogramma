@@ -23,6 +23,7 @@ def extract_vpg(video_path):
 
         # Детекция лица
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        # в некоторых версиях необходимо использовать    face_cascade=cv2.CascadeClassifier('haarcascade_frontalface_default.xml') вместо строки 25
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
         # Определение минимального значения стороны прямоугольника лица
@@ -76,10 +77,10 @@ def extract_vpg(video_path):
 
 
     # Пример использования функции
-source_dir = 'C:/Users/79778/PycharmProjects/Practics/AVIMeasurements'
+source_dir = 'C:/Users/79778/PycharmProjects/Practics/AVIMeasurements' # Путь до папки с видео 
 file_names = os.listdir(source_dir)
 for file_name in file_names:
-    video_path = f'C:/Users/79778/PycharmProjects/Practics/AVIMeasurements/{file_name}'
+    video_path = f'C:/Users/79778/PycharmProjects/Practics/AVIMeasurements/{file_name}' # путь жо папки с видео
     vpg_signal = extract_vpg(video_path)
     # Создание массива времени
     time = np.arange(len(vpg_signal))
@@ -87,7 +88,7 @@ for file_name in file_names:
     # Округление значений амплитуды до трех знаков после запятой
     rounded_vpg_signal = np.round(vpg_signal, 3)*10
 
-    # Сохранение значений амплитуды сигнала по времени в файл
+    # Сохранение значений амплитуды сигнала по времени в созданный файл
     data = np.column_stack((time, rounded_vpg_signal))
     file = open(f'{file_name}.txt', "w")
     np.savetxt(file, data, delimiter=',', header='Time,Amplitude', comments='', fmt='%.3f')
